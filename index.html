@@ -4,111 +4,118 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>ЛЕГИОН — парк курьеров</title>
-
-  <!-- Пинованные CDN -->
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-  <script crossorigin src="https://cdn.jsdelivr.net/npm/react-router-dom@6.23.1/umd/react-router-dom.production.min.js"></script>
-  <!-- Telegram WebApp API -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
   <style>
-    :root{
-      --bg:#0f0f0f; --panel:#151515; --text:#e9e9e9; --muted:#bcbcbc;
-      --accent:#d74848; --accent-2:#ff3b3b; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    html,body,#root{height:100%}
-    body{
-      margin:0;
-      background:
-        radial-gradient(1200px 900px at 100% -10%, rgba(215,72,72,.12), transparent 35%),
-        radial-gradient(1200px 900px at -10% 110%, rgba(255,59,59,.08), transparent 35%),
-        var(--bg);
-      color:var(--text);
-      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-    }
+    :root{--bg:#0f0f0f;--panel:#151515;--text:#e9e9e9;--muted:#bcbcbc;--accent:#d74848;--accent-2:#ff3b3b;--radius:16px;--shadow:0 10px 30px rgba(0,0,0,.35)}
+    *{box-sizing:border-box} html,body,#root{height:100%}
+    body{margin:0;background:
+      radial-gradient(1200px 900px at 100% -10%, rgba(215,72,72,.12), transparent 35%),
+      radial-gradient(1200px 900px at -10% 110%, rgba(255,59,59,.08), transparent 35%),
+      var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif}
     .wrap{max-width:960px;margin:0 auto;padding:18px 18px 40px}
     header{display:flex;align-items:center;gap:12px;margin:8px 0 20px}
-    .logo{
-      width:36px;height:36px;border-radius:10px;
-      background:linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow:0 0 18px rgba(215,72,72,.35), inset 0 0 14px rgba(0,0,0,.3);
-    }
-    .brand{font-weight:700;letter-spacing:.4px}
-    .hint{font-size:13px;color:var(--muted)}
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);
-      border:1px solid rgba(255,255,255,.06); border-radius:var(--radius);
-      box-shadow:var(--shadow); padding:18px;
-    }
-    h1{margin:0 0 6px;font-size:22px;letter-spacing:.3px}
-    h2{margin:0 0 10px;font-size:18px;color:#fff}
-    p{margin:8px 0;color:var(--muted)}
-    .grid{display:grid;gap:12px}
-    .grid.cols-2{grid-template-columns:1fr 1fr}
-    .grid.cols-3{grid-template-columns:1fr 1fr 1fr}
-    @media (max-width:720px){.grid.cols-2,.grid.cols-3{grid-template-columns:1fr}}
-    .btn{
-      appearance:none;border:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));
-      color:#fff;padding:12px 14px;border-radius:12px;cursor:pointer;
-      transition:.2s;font-weight:600;letter-spacing:.2px;text-align:center;
-    }
-    .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.16)}
-    .btn.primary{background:linear-gradient(135deg, var(--accent), var(--accent-2));border:none;box-shadow:0 8px 22px rgba(215,72,72,.35)}
-    .btn.ghost{background:transparent}
-    .btn.full{width:100%}
+    .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 18px rgba(215,72,72,.35), inset 0 0 14px rgba(0,0,0,.3)}
+    .brand{font-weight:700;letter-spacing:.4px}.hint{font-size:13px;color:var(--muted)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    h1{margin:0 0 6px;font-size:22px;letter-spacing:.3px} h2{margin:0 0 10px;font-size:18px;color:#fff} p{margin:8px 0;color:var(--muted)}
+    .grid{display:grid;gap:12px}.grid.cols-2{grid-template-columns:1fr 1fr}.grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+    @media(max-width:720px){.grid.cols-2,.grid.cols-3{grid-template-columns:1fr}}
+    .btn{appearance:none;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));color:#fff;padding:12px 14px;border-radius:12px;cursor:pointer;transition:.2s;font-weight:600;letter-spacing:.2px;text-align:center}
+    .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.16)} .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;box-shadow:0 8px 22px rgba(215,72,72,.35)} .btn.ghost{background:transparent} .btn.full{width:100%}
     .pill{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.06);padding:6px 10px;border-radius:999px;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,.08)}
-    .field{display:grid;gap:6px}
-    .input, select{width:100%;padding:12px 14px;color:#fff;background:#131313;border:1px solid rgba(255,255,255,.12);border-radius:12px;outline:none;transition:.2s}
-    .input:focus, select:focus{border-color:var(--accent)}
-    .footer{margin-top:12px;font-size:13px;color:var(--muted);text-align:center}
-    .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);margin:12px 0}
-    .emoji{filter:drop-shadow(0 2px 6px rgba(255,255,255,.2))}
+    .field{display:grid;gap:6px}.input,select{width:100%;padding:12px 14px;color:#fff;background:#131313;border:1px solid rgba(255,255,255,.12);border-radius:12px;outline:none;transition:.2s}
+    .input:focus,select:focus{border-color:var(--accent)} .footer{margin-top:12px;font-size:13px;color:var(--muted);text-align:center}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);margin:12px 0} .emoji{filter:drop-shadow(0 2px 6px rgba(255,255,255,.2))}
+    /* диагностическая плашка */
+    #diag{position:fixed;left:0;right:0;top:0;background:#1b1b1b;color:#fff;padding:8px 12px;font:13px/1.4 system-ui,Segoe UI,Roboto,Arial;z-index:9999;border-bottom:1px solid rgba(255,255,255,.08)}
+    #diag.ok{display:none}
   </style>
 </head>
 <body>
+  <!-- Диагностика: заменится на OK, если всё загрузилось -->
+  <div id="diag">Загрузка… (если это висит &gt; 5 сек, возможно, CDN заблокирован)</div>
   <div id="root"></div>
 
-  <script type="text/javascript">
-    // Telegram WebApp объект (без optional chaining)
-    var tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-    if (tg) {
-      try {
-        tg.ready();
-        tg.expand();
-        tg.setHeaderColor("#0f0f0f");
-        tg.setBackgroundColor("#0f0f0f");
-      } catch(e){}
+  <!-- Telegram API (локальный, без CDN) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <script>
+  // ===== Мини-загрузчик с фолбэками и диагностикой =====
+  (function(){
+    var diag = document.getElementById('diag');
+    function log(msg){ diag.textContent = msg; }
+    function ok(){ diag.className = 'ok'; }
+
+    function loadScript(urls, ondone){
+      var i = 0;
+      function tryLoad(){
+        if(i >= urls.length){ log('Ошибка: не удалось загрузить '+urls.join(' или ')); return; }
+        var s = document.createElement('script');
+        s.src = urls[i] + (urls[i].indexOf('?')>-1?'&':'?') + 'v=10';
+        s.async = false;
+        s.onload = function(){ ondone(); };
+        s.onerror = function(){ i++; tryLoad(); };
+        document.head.appendChild(s);
+      }
+      tryLoad();
     }
 
-    var Router = ReactRouterDOM;
-    var useNavigate = Router.useNavigate;
+    var reactURLS = [
+      'https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js',
+      'https://unpkg.com/react@18.2.0/umd/react.production.min.js'
+    ];
+    var reactDOMURLS = [
+      'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js',
+      'https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js'
+    ];
+    var rrdURLS = [
+      'https://cdn.jsdelivr.net/npm/react-router-dom@6.23.1/umd/react-router-dom.production.min.js',
+      'https://unpkg.com/react-router-dom@6.23.1/umd/react-router-dom.production.min.js'
+    ];
+
+    loadScript(reactURLS, function(){
+      log('React загружен…');
+      loadScript(reactDOMURLS, function(){
+        log('ReactDOM загружен…');
+        loadScript(rrdURLS, function(){
+          log('Библиотеки загружены. Инициализация…');
+          startApp(ok, log);
+        });
+      });
+    });
+  })();
+  </script>
+
+  <!-- ===== Само приложение (ES5, без современных фич) ===== -->
+  <script>
+  function startApp(onOk, log){
+    var tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+    try{
+      if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor("#0f0f0f"); tg.setBackgroundColor("#0f0f0f"); }
+    }catch(e){}
+
+    var Router = window.ReactRouterDOM;
+    if(!Router){ log('Не найден ReactRouterDOM'); return; }
+
     var HashRouter = Router.HashRouter;
     var Routes = Router.Routes;
     var Route = Router.Route;
+    var useNavigate = Router.useNavigate;
 
-    // UI атомы (ES5)
     function Card(props){ return React.createElement("div",{className:"card "+(props.className||"")}, props.children); }
     function Btn(props){
       var tag = props.href ? "a" : "button";
-      return React.createElement(tag, {
-        className: "btn "+(props.variant||"")+" "+(props.full?"full":""),
-        onClick: props.onClick, href: props.href
-      }, props.children);
+      return React.createElement(tag,{className:"btn "+(props.variant||"")+" "+(props.full?"full":""),onClick:props.onClick,href:props.href},props.children);
     }
     function Header(){
-      return React.createElement("header", null,
+      return React.createElement("header",null,
         React.createElement("div",{className:"logo"}),
-        React.createElement("div", null,
-          React.createElement("div",{className:"brand"}, "ЛЕГИОН"),
-          React.createElement("div",{className:"hint"}, "Парк курьеров")
+        React.createElement("div",null,
+          React.createElement("div",{className:"brand"},"ЛЕГИОН"),
+          React.createElement("div",{className:"hint"},"Парк курьеров")
         )
       );
     }
 
-    // Страницы
     function Welcome(){
       var nav = useNavigate();
       return React.createElement("div",{className:"grid",style:{gap:16}},
@@ -138,9 +145,9 @@
           React.createElement("div",{className:"divider"}),
           React.createElement("h2",null,"Преимущества"),
           React.createElement("div",{className:"grid cols-3"},
-            React.createElement("div",null, React.createElement("div",{className:"emoji"},"💳"), React.createElement("p",null,"Выплаты вовремя")),
-            React.createElement("div",null, React.createElement("div",{className:"emoji"},"🧭"), React.createElement("p",null,"Удобные смены")),
-            React.createElement("div",null, React.createElement("div",{className:"emoji"},"🛟"), React.createElement("p",null,"Живая поддержка"))
+            React.createElement("div",null,React.createElement("div",{className:"emoji"},"💳"),React.createElement("p",null,"Выплаты вовремя")),
+            React.createElement("div",null,React.createElement("div",{className:"emoji"},"🧭"),React.createElement("p",null,"Удобные смены")),
+            React.createElement("div",null,React.createElement("div",{className:"emoji"},"🛟"),React.createElement("p",null,"Живая поддержка"))
           ),
           React.createElement("div",{style:{height:8}}),
           React.createElement(Btn,{variant:"primary",onClick:function(){nav("/register");}},"Подключиться")
@@ -151,13 +158,11 @@
     function Login(){
       var nav = useNavigate();
       var user = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : null;
-      var who = user ? (user.username ? ("@"+user.username) : ((user.first_name||"")+" "+(user.last_name||""))) : null;
+      var who = user ? (user.username?("@"+user.username):((user.first_name||"")+" "+(user.last_name||""))) : null;
       return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Вход"),
-          who
-            ? React.createElement("p",null,"Вы вошли как ", React.createElement("b",null, who))
-            : React.createElement("p",null,"Откройте мини-приложение из чата с ботом."),
+          who?React.createElement("p",null,"Вы вошли как ",React.createElement("b",null,who)):React.createElement("p",null,"Откройте мини-приложение из чата с ботом."),
           React.createElement("div",{className:"grid cols-2"},
             React.createElement(Btn,{variant:"primary",onClick:function(){nav("/profile");}},"Перейти в профиль"),
             React.createElement(Btn,{onClick:function(){nav("/");}},"На главную")
@@ -173,8 +178,8 @@
       return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Профиль"),
-          React.createElement("p",null,"ФИО: ", React.createElement("b",null, fio)),
-          React.createElement("p",null,"Статус: ", React.createElement("b",null,"В разработке")),
+          React.createElement("p",null,"ФИО: ",React.createElement("b",null,fio)),
+          React.createElement("p",null,"Статус: ",React.createElement("b",null,"В разработке")),
           React.createElement("div",{className:"grid cols-2"},
             React.createElement(Btn,{onClick:function(){nav("/stats");}},"📊 Статистика"),
             React.createElement(Btn,{onClick:function(){nav("/support");}},"🛟 Поддержка")
@@ -209,38 +214,24 @@
 
     function Register(){
       var nav = useNavigate();
-      var _useState = React.useState({name:"",city:"",phone:"",transport:"Пеший",agg:"TopGO"});
-      var form = _useState[0], setForm = _useState[1];
-
-      function change(k){ return function(e){ var obj={}; obj[k]=e.target.value; setForm(Object.assign({},form,obj)); }; }
+      var _st = React.useState({name:"",city:"",phone:"",transport:"Пеший",agg:"TopGO"});
+      var form = _st[0], setForm = _st[1];
+      function change(k){ return function(e){ var o={}; o[k]=e.target.value; setForm(Object.assign({},form,o)); }; }
       function submit(){
-        var payload = { action:"registration", data:form };
-        if (tg && tg.sendData){
-          try { tg.sendData(JSON.stringify(payload)); if (tg.HapticFeedback && tg.HapticFeedback.notificationOccurred) tg.HapticFeedback.notificationOccurred("success"); } catch(e){}
-        }
+        var payload = {action:"registration", data:form};
+        if(tg && tg.sendData){ try{ tg.sendData(JSON.stringify(payload)); if(tg.HapticFeedback && tg.HapticFeedback.notificationOccurred) tg.HapticFeedback.notificationOccurred("success"); }catch(e){} }
         alert("Заявка отправлена. Мы свяжемся с вами в ближайшее время!");
         nav("/");
       }
-
       return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Заявка на подключение"),
           React.createElement("div",{className:"grid",style:{gap:12}},
-            React.createElement("div",{className:"field"},
-              React.createElement("label",null,"ФИО"),
-              React.createElement("input",{className:"input",placeholder:"Иванов Иван",value:form.name,onChange:change("name")})
-            ),
-            React.createElement("div",{className:"field"},
-              React.createElement("label",null,"Город"),
-              React.createElement("input",{className:"input",placeholder:"Москва",value:form.city,onChange:change("city")})
-            ),
-            React.createElement("div",{className:"field"},
-              React.createElement("label",null,"Телефон"),
-              React.createElement("input",{className:"input",inputMode:"tel",placeholder:"+7 9__",value:form.phone,onChange:change("phone")})
-            ),
+            React.createElement("div",{className:"field"}, React.createElement("label",null,"ФИО"), React.createElement("input",{className:"input",placeholder:"Иванов Иван",value:form.name,onChange:change("name")})),
+            React.createElement("div",{className:"field"}, React.createElement("label",null,"Город"), React.createElement("input",{className:"input",placeholder:"Москва",value:form.city,onChange:change("city")})),
+            React.createElement("div",{className:"field"}, React.createElement("label",null,"Телефон"), React.createElement("input",{className:"input",inputMode:"tel",placeholder:"+7 9__",value:form.phone,onChange:change("phone")})),
             React.createElement("div",{className:"grid cols-2"},
-              React.createElement("div",{className:"field"},
-                React.createElement("label",null,"Тип транспорта"),
+              React.createElement("div",{className:"field"}, React.createElement("label",null,"Тип транспорта"),
                 React.createElement("select",{value:form.transport,onChange:change("transport")},
                   React.createElement("option",{value:"Пеший"},"Пеший"),
                   React.createElement("option",{value:"Вело"},"Вело"),
@@ -248,8 +239,7 @@
                   React.createElement("option",{value:"Авто"},"Авто")
                 )
               ),
-              React.createElement("div",{className:"field"},
-                React.createElement("label",null,"Агрегатор"),
+              React.createElement("div",{className:"field"}, React.createElement("label",null,"Агрегатор"),
                 React.createElement("select",{value:form.agg,onChange:change("agg")},
                   React.createElement("option",{value:"TopGO"},"TopGO"),
                   React.createElement("option",{value:"Яндекс Доставка"},"Яндекс Доставка"),
@@ -269,7 +259,7 @@
     }
 
     function App(){
-      React.useEffect(function(){ if(tg && tg.expand) try{ tg.expand(); }catch(e){} }, []);
+      React.useEffect(function(){ try{ if(tg && tg.expand) tg.expand(); }catch(e){} }, []);
       return React.createElement("div",{className:"wrap"},
         React.createElement(Header,null),
         React.createElement(Routes,null,
@@ -285,9 +275,21 @@
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(
-      React.createElement(HashRouter,null, React.createElement(App,null))
-    );
+    try{
+      ReactDOM.createRoot(document.getElementById('root')).render(
+        React.createElement(HashRouter,null, React.createElement(App,null))
+      );
+      onOk(); // прячем диагностику
+    }catch(e){
+      log('Инициализация упала: '+ (e && e.message ? e.message : e));
+    }
+
+    // на всякий — ловим необработанные ошибки
+    window.onerror = function(msg, src, line, col, err){
+      var text = 'JS ошибка: '+msg+' @'+(src||'')+':'+(line||0);
+      var d = document.getElementById('diag'); d.className=''; d.textContent = text;
+    };
+  }
   </script>
 </body>
 </html>
