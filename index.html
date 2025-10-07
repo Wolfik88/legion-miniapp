@@ -87,6 +87,19 @@
 <body>
   <div id="root"></div>
 
+<script>
+  // Покажем на странице, если React внезапно не подхватился
+  setTimeout(function(){
+    if (!window.React || !window.ReactDOM || !window.ReactRouterDOM) {
+      var warn = document.createElement('div');
+      warn.style.cssText='position:fixed;left:12px;bottom:12px;background:#261313;color:#fff;padding:10px 12px;border-radius:8px;border:1px solid #a33;';
+      warn.textContent='Не загрузились библиотеки (CDN). Проверьте интернет/CDN.';
+      document.body.appendChild(warn);
+      console.error('CDN not loaded:', {React: !!window.React, ReactDOM: !!window.ReactDOM, RRD: !!window.ReactRouterDOM});
+    }
+  }, 800);
+</script>
+
   <script type="text/javascript">
   const { useEffect, useMemo, useState } = React;
   const { HashRouter, Routes, Route, useNavigate } = ReactRouterDOM;
