@@ -25,270 +25,242 @@
     .field{display:grid;gap:6px}.input,select{width:100%;padding:12px 14px;color:#fff;background:#131313;border:1px solid rgba(255,255,255,.12);border-radius:12px;outline:none;transition:.2s}
     .input:focus,select:focus{border-color:var(--accent)} .footer{margin-top:12px;font-size:13px;color:var(--muted);text-align:center}
     .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);margin:12px 0} .emoji{filter:drop-shadow(0 2px 6px rgba(255,255,255,.2))}
-    /* диагностическая плашка */
     #diag{position:fixed;left:0;right:0;top:0;background:#1b1b1b;color:#fff;padding:8px 12px;font:13px/1.4 system-ui,Segoe UI,Roboto,Arial;z-index:9999;border-bottom:1px solid rgba(255,255,255,.08)}
     #diag.ok{display:none}
   </style>
 </head>
 <body>
-  <!-- Диагностика: заменится на OK, если всё загрузилось -->
-  <div id="diag">Загрузка… (если это висит &gt; 5 сек, возможно, CDN заблокирован)</div>
+  <div id="diag">Загрузка…</div>
   <div id="root"></div>
-
-  <!-- Telegram API (локальный, без CDN) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
-  // ===== Мини-загрузчик с фолбэками и диагностикой =====
+  // ===== загрузка React/ReactDOM с фолбэками (без react-router) =====
   (function(){
     var diag = document.getElementById('diag');
-    function log(msg){ diag.textContent = msg; }
-    function ok(){ diag.className = 'ok'; }
+    function log(t){ diag.textContent = t; }
+    function ok(){ diag.className='ok'; }
 
-    function loadScript(urls, ondone){
-      var i = 0;
-      function tryLoad(){
-        if(i >= urls.length){ log('Ошибка: не удалось загрузить '+urls.join(' или ')); return; }
-        var s = document.createElement('script');
-        s.src = urls[i] + (urls[i].indexOf('?')>-1?'&':'?') + 'v=10';
-        s.async = false;
-        s.onload = function(){ ondone(); };
-        s.onerror = function(){ i++; tryLoad(); };
+    function load(urls, cb){
+      var i=0;
+      (function next(){
+        if(i>=urls.length){ log('Ошибка: не удалось загрузить '+urls.join(' или ')); return; }
+        var s=document.createElement('script');
+        s.src=urls[i]+(urls[i].indexOf('?')>-1?'&':'?')+'v=11';
+        s.async=false;
+        s.onload=function(){ cb(); };
+        s.onerror=function(){ i++; next(); };
         document.head.appendChild(s);
-      }
-      tryLoad();
+      })();
     }
 
-    var reactURLS = [
+    load([
       'https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js',
       'https://unpkg.com/react@18.2.0/umd/react.production.min.js'
-    ];
-    var reactDOMURLS = [
-      'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js',
-      'https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js'
-    ];
-    var rrdURLS = [
-      'https://cdn.jsdelivr.net/npm/react-router-dom@6.23.1/umd/react-router-dom.production.min.js',
-      'https://unpkg.com/react-router-dom@6.23.1/umd/react-router-dom.production.min.js'
-    ];
-
-    loadScript(reactURLS, function(){
+    ], function(){
       log('React загружен…');
-      loadScript(reactDOMURLS, function(){
-        log('ReactDOM загружен…');
-        loadScript(rrdURLS, function(){
-          log('Библиотеки загружены. Инициализация…');
-          startApp(ok, log);
-        });
+      load([
+        'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js',
+        'https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js'
+      ], function(){
+        log('Инициализация…');
+        startApp(ok, log);
       });
     });
   })();
   </script>
 
-  <!-- ===== Само приложение (ES5, без современных фич) ===== -->
   <script>
+  // ===== приложение без стороннего роутера (hash-навигация) =====
   function startApp(onOk, log){
     var tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-    try{
-      if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor("#0f0f0f"); tg.setBackgroundColor("#0f0f0f"); }
-    }catch(e){}
+    try{ if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor("#0f0f0f"); tg.setBackgroundColor("#0f0f0f"); } }catch(e){}
 
-    var Router = window.ReactRouterDOM;
-    if(!Router){ log('Не найден ReactRouterDOM'); return; }
+    function setHash(path){ location.hash = '#'+path; }
+    function getHash(){ return (location.hash||'#/').slice(1) || '/'; }
 
-    var HashRouter = Router.HashRouter;
-    var Routes = Router.Routes;
-    var Route = Router.Route;
-    var useNavigate = Router.useNavigate;
+    function Card(p){ return React.createElement('div',{className:'card '+(p.className||'')}, p.children); }
+    function Btn(p){ var tag=p.href?'a':'button'; return React.createElement(tag,{className:'btn '+(p.variant||'')+' '+(p.full?'full':''), onClick:p.onClick, href:p.href}, p.children); }
+    function Header(){ return React.createElement('header',null,
+      React.createElement('div',{className:'logo'}),
+      React.createElement('div',null,
+        React.createElement('div',{className:'brand'},'ЛЕГИОН'),
+        React.createElement('div',{className:'hint'},'Парк курьеров')
+      )
+    );}
 
-    function Card(props){ return React.createElement("div",{className:"card "+(props.className||"")}, props.children); }
-    function Btn(props){
-      var tag = props.href ? "a" : "button";
-      return React.createElement(tag,{className:"btn "+(props.variant||"")+" "+(props.full?"full":""),onClick:props.onClick,href:props.href},props.children);
-    }
-    function Header(){
-      return React.createElement("header",null,
-        React.createElement("div",{className:"logo"}),
-        React.createElement("div",null,
-          React.createElement("div",{className:"brand"},"ЛЕГИОН"),
-          React.createElement("div",{className:"hint"},"Парк курьеров")
-        )
-      );
-    }
-
-    function Welcome(){
-      var nav = useNavigate();
-      return React.createElement("div",{className:"grid",style:{gap:16}},
+    function Welcome(props){
+      return React.createElement('div',{className:'grid',style:{gap:16}},
         React.createElement(Card,null,
-          React.createElement("h1",null,"Работай с теми, кто ценит твоё время"),
-          React.createElement("p",null,"Парк ЛЕГИОН — надёжные выплаты, поддержка и удобные смены."),
-          React.createElement("div",{className:"grid cols-2"},
-            React.createElement(Btn,{variant:"primary",onClick:function(){nav("/login");}},"🔑 Войти"),
-            React.createElement(Btn,{onClick:function(){nav("/register");}},"📝 Зарегистрироваться")
+          React.createElement('h1',null,'Работай с теми, кто ценит твоё время'),
+          React.createElement('p',null,'Парк ЛЕГИОН — надёжные выплаты, поддержка и удобные смены.'),
+          React.createElement('div',{className:'grid cols-2'},
+            React.createElement(Btn,{variant:'primary', onClick:function(){ setHash('/login'); }},'🔑 Войти'),
+            React.createElement(Btn,{onClick:function(){ setHash('/register'); }},'📝 Зарегистрироваться')
           ),
-          React.createElement("div",{style:{height:8}}),
-          React.createElement(Btn,{variant:"ghost",full:true,onClick:function(){nav("/about");}},"ℹ️ Подробнее")
+          React.createElement('div',{style:{height:8}}),
+          React.createElement(Btn,{variant:'ghost', full:true, onClick:function(){ setHash('/about'); }},'ℹ️ Подробнее')
         ),
         React.createElement(Card,null,
-          React.createElement("div",{className:"pill"},"⚡ Быстрые выплаты"),
-          React.createElement("div",{className:"pill",style:{marginLeft:8}},"🛡 Поддержка 8:00–00:00")
+          React.createElement('div',{className:'pill'},'⚡ Быстрые выплаты'),
+          React.createElement('div',{className:'pill',style:{marginLeft:8}},'🛡 Поддержка 8:00–00:00')
         )
       );
     }
 
     function About(){
-      var nav = useNavigate();
-      return React.createElement("div",{className:"grid",style:{gap:16}},
+      return React.createElement('div',{className:'grid',style:{gap:16}},
         React.createElement(Card,null,
-          React.createElement("h1",null,"О парке"),
-          React.createElement("p",null,"Подключаем курьеров по всей России. Прозрачные условия, стабильные выплаты и поддержка."),
-          React.createElement("div",{className:"divider"}),
-          React.createElement("h2",null,"Преимущества"),
-          React.createElement("div",{className:"grid cols-3"},
-            React.createElement("div",null,React.createElement("div",{className:"emoji"},"💳"),React.createElement("p",null,"Выплаты вовремя")),
-            React.createElement("div",null,React.createElement("div",{className:"emoji"},"🧭"),React.createElement("p",null,"Удобные смены")),
-            React.createElement("div",null,React.createElement("div",{className:"emoji"},"🛟"),React.createElement("p",null,"Живая поддержка"))
+          React.createElement('h1',null,'О парке'),
+          React.createElement('p',null,'Подключаем курьеров по всей России. Прозрачные условия, стабильные выплаты и поддержка.'),
+          React.createElement('div',{className:'divider'}),
+          React.createElement('h2',null,'Преимущества'),
+          React.createElement('div',{className:'grid cols-3'},
+            React.createElement('div',null,React.createElement('div',{className:'emoji'},'💳'),React.createElement('p',null,'Выплаты вовремя')),
+            React.createElement('div',null,React.createElement('div',{className:'emoji'},'🧭'),React.createElement('p',null,'Удобные смены')),
+            React.createElement('div',null,React.createElement('div',{className:'emoji'},'🛟'),React.createElement('p',null,'Живая поддержка'))
           ),
-          React.createElement("div",{style:{height:8}}),
-          React.createElement(Btn,{variant:"primary",onClick:function(){nav("/register");}},"Подключиться")
+          React.createElement('div',{style:{height:8}}),
+          React.createElement(Btn,{variant:'primary', onClick:function(){ setHash('/register'); }},'Подключиться')
         )
       );
     }
 
     function Login(){
-      var nav = useNavigate();
       var user = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : null;
-      var who = user ? (user.username?("@"+user.username):((user.first_name||"")+" "+(user.last_name||""))) : null;
-      return React.createElement("div",{className:"grid",style:{gap:16}},
+      var who = user ? (user.username?('@'+user.username):((user.first_name||'')+' '+(user.last_name||''))) : null;
+      return React.createElement('div',{className:'grid',style:{gap:16}},
         React.createElement(Card,null,
-          React.createElement("h1",null,"Вход"),
-          who?React.createElement("p",null,"Вы вошли как ",React.createElement("b",null,who)):React.createElement("p",null,"Откройте мини-приложение из чата с ботом."),
-          React.createElement("div",{className:"grid cols-2"},
-            React.createElement(Btn,{variant:"primary",onClick:function(){nav("/profile");}},"Перейти в профиль"),
-            React.createElement(Btn,{onClick:function(){nav("/");}},"На главную")
+          React.createElement('h1',null,'Вход'),
+          who?React.createElement('p',null,'Вы вошли как ',React.createElement('b',null,who))
+             :React.createElement('p',null,'Откройте мини-приложение из чата с ботом.'),
+          React.createElement('div',{className:'grid cols-2'},
+            React.createElement(Btn,{variant:'primary', onClick:function(){ setHash('/profile'); }},'Перейти в профиль'),
+            React.createElement(Btn,{onClick:function(){ setHash('/'); }},'На главную')
           )
         )
       );
     }
 
     function Profile(){
-      var nav = useNavigate();
       var user = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : null;
-      var fio = user ? ((user.first_name||"")+" "+(user.last_name||"")) : "—";
-      return React.createElement("div",{className:"grid",style:{gap:16}},
+      var fio = user ? ((user.first_name||'')+' '+(user.last_name||'')) : '—';
+      return React.createElement('div',{className:'grid',style:{gap:16}},
         React.createElement(Card,null,
-          React.createElement("h1",null,"Профиль"),
-          React.createElement("p",null,"ФИО: ",React.createElement("b",null,fio)),
-          React.createElement("p",null,"Статус: ",React.createElement("b",null,"В разработке")),
-          React.createElement("div",{className:"grid cols-2"},
-            React.createElement(Btn,{onClick:function(){nav("/stats");}},"📊 Статистика"),
-            React.createElement(Btn,{onClick:function(){nav("/support");}},"🛟 Поддержка")
+          React.createElement('h1',null,'Профиль'),
+          React.createElement('p',null,'ФИО: ',React.createElement('b',null,fio)),
+          React.createElement('p',null,'Статус: ',React.createElement('b',null,'В разработке')),
+          React.createElement('div',{className:'grid cols-2'},
+            React.createElement(Btn,{onClick:function(){ setHash('/stats'); }},'📊 Статистика'),
+            React.createElement(Btn,{onClick:function(){ setHash('/support'); }},'🛟 Поддержка')
           ),
-          React.createElement("div",{style:{height:8}}),
-          React.createElement(Btn,{variant:"ghost",onClick:function(){nav("/");}},"⬅️ На главную")
+          React.createElement('div',{style:{height:8}}),
+          React.createElement(Btn,{variant:'ghost', onClick:function(){ setHash('/'); }},'⬅️ На главную')
         )
       );
     }
 
     function Support(){
-      var nav = useNavigate();
-      return React.createElement("div",{className:"grid",style:{gap:16}},
+      return React.createElement('div',{className:'grid',style:{gap:16}},
         React.createElement(Card,null,
-          React.createElement("h1",null,"Поддержка"),
-          React.createElement("p",null,"Раздел скоро будет доступен."),
-          React.createElement(Btn,{onClick:function(){nav(-1);}},"⬅️ Назад")
+          React.createElement('h1',null,'Поддержка'),
+          React.createElement('p',null,'Раздел скоро будет доступен.'),
+          React.createElement(Btn,{onClick:function(){ history.back(); }},'⬅️ Назад')
         )
       );
     }
 
     function Stats(){
-      var nav = useNavigate();
-      return React.createElement("div",{className:"grid",style:{gap:16}},
+      return React.createElement('div',{className:'grid',style:{gap:16}},
         React.createElement(Card,null,
-          React.createElement("h1",null,"Статистика"),
-          React.createElement("p",null,"В разработке — синхронизируем с ботом."),
-          React.createElement(Btn,{onClick:function(){nav(-1);}},"⬅️ Назад")
+          React.createElement('h1',null,'Статистика'),
+          React.createElement('p',null,'В разработке — синхронизируем с ботом.'),
+          React.createElement(Btn,{onClick:function(){ history.back(); }},'⬅️ Назад')
         )
       );
     }
 
     function Register(){
-      var nav = useNavigate();
       var _st = React.useState({name:"",city:"",phone:"",transport:"Пеший",agg:"TopGO"});
-      var form = _st[0], setForm = _st[1];
+      var form=_st[0], setForm=_st[1];
       function change(k){ return function(e){ var o={}; o[k]=e.target.value; setForm(Object.assign({},form,o)); }; }
       function submit(){
-        var payload = {action:"registration", data:form};
-        if(tg && tg.sendData){ try{ tg.sendData(JSON.stringify(payload)); if(tg.HapticFeedback && tg.HapticFeedback.notificationOccurred) tg.HapticFeedback.notificationOccurred("success"); }catch(e){} }
-        alert("Заявка отправлена. Мы свяжемся с вами в ближайшее время!");
-        nav("/");
+        var payload={action:'registration',data:form};
+        try{ if(tg && tg.sendData){ tg.sendData(JSON.stringify(payload)); tg.HapticFeedback && tg.HapticFeedback.notificationOccurred && tg.HapticFeedback.notificationOccurred('success'); } }catch(e){}
+        alert('Заявка отправлена. Мы свяжемся с вами в ближайшее время!');
+        setHash('/');
       }
-      return React.createElement("div",{className:"grid",style:{gap:16}},
+      return React.createElement('div',{className:'grid',style:{gap:16}},
         React.createElement(Card,null,
-          React.createElement("h1",null,"Заявка на подключение"),
-          React.createElement("div",{className:"grid",style:{gap:12}},
-            React.createElement("div",{className:"field"}, React.createElement("label",null,"ФИО"), React.createElement("input",{className:"input",placeholder:"Иванов Иван",value:form.name,onChange:change("name")})),
-            React.createElement("div",{className:"field"}, React.createElement("label",null,"Город"), React.createElement("input",{className:"input",placeholder:"Москва",value:form.city,onChange:change("city")})),
-            React.createElement("div",{className:"field"}, React.createElement("label",null,"Телефон"), React.createElement("input",{className:"input",inputMode:"tel",placeholder:"+7 9__",value:form.phone,onChange:change("phone")})),
-            React.createElement("div",{className:"grid cols-2"},
-              React.createElement("div",{className:"field"}, React.createElement("label",null,"Тип транспорта"),
-                React.createElement("select",{value:form.transport,onChange:change("transport")},
-                  React.createElement("option",{value:"Пеший"},"Пеший"),
-                  React.createElement("option",{value:"Вело"},"Вело"),
-                  React.createElement("option",{value:"Электро"},"Электро"),
-                  React.createElement("option",{value:"Авто"},"Авто")
+          React.createElement('h1',null,'Заявка на подключение'),
+          React.createElement('div',{className:'grid',style:{gap:12}},
+            React.createElement('div',{className:'field'},React.createElement('label',null,'ФИО'),React.createElement('input',{className:'input',placeholder:'Иванов Иван',value:form.name,onChange:change('name')})),
+            React.createElement('div',{className:'field'},React.createElement('label',null,'Город'),React.createElement('input',{className:'input',placeholder:'Москва',value:form.city,onChange:change('city')})),
+            React.createElement('div',{className:'field'},React.createElement('label',null,'Телефон'),React.createElement('input',{className:'input',inputMode:'tel',placeholder:'+7 9__',value:form.phone,onChange:change('phone')})),
+            React.createElement('div',{className:'grid cols-2'},
+              React.createElement('div',{className:'field'},React.createElement('label',null,'Тип транспорта'),
+                React.createElement('select',{value:form.transport,onChange:change('transport')},
+                  React.createElement('option',{value:'Пеший'},'Пеший'),
+                  React.createElement('option',{value:'Вело'},'Вело'),
+                  React.createElement('option',{value:'Электро'},'Электро'),
+                  React.createElement('option',{value:'Авто'},'Авто')
                 )
               ),
-              React.createElement("div",{className:"field"}, React.createElement("label",null,"Агрегатор"),
-                React.createElement("select",{value:form.agg,onChange:change("agg")},
-                  React.createElement("option",{value:"TopGO"},"TopGO"),
-                  React.createElement("option",{value:"Яндекс Доставка"},"Яндекс Доставка"),
-                  React.createElement("option",{value:"Купер"},"Купер"),
-                  React.createElement("option",{value:"Другое"},"Другое")
+              React.createElement('div',{className:'field'},React.createElement('label',null,'Агрегатор'),
+                React.createElement('select',{value:form.agg,onChange:change('agg')},
+                  React.createElement('option',{value:'TopGO'},'TopGO'),
+                  React.createElement('option',{value:'Яндекс Доставка'},'Яндекс Доставка'),
+                  React.createElement('option',{value:'Купер'},'Купер'),
+                  React.createElement('option',{value:'Другое'},'Другое')
                 )
               )
             ),
-            React.createElement("div",{className:"grid cols-2"},
-              React.createElement(Btn,{variant:"primary",onClick:submit},"Отправить"),
-              React.createElement(Btn,{onClick:function(){nav(-1);}},"⬅️ Назад")
+            React.createElement('div',{className:'grid cols-2'},
+              React.createElement(Btn,{variant:'primary',onClick:submit},'Отправить'),
+              React.createElement(Btn,{onClick:function(){ history.back(); }},'⬅️ Назад')
             ),
-            React.createElement("div",{className:"hint"},"Заявка уходит менеджеру парка. Мы отвечаем в течение дня.")
+            React.createElement('div',{className:'hint'},'Заявка уходит менеджеру парка. Мы отвечаем в течение дня.')
           )
         )
       );
     }
 
     function App(){
-      React.useEffect(function(){ try{ if(tg && tg.expand) tg.expand(); }catch(e){} }, []);
-      return React.createElement("div",{className:"wrap"},
+      var _r = React.useState(getHash()); var route=_r[0], setRoute=_r[1];
+      React.useEffect(function(){
+        function onHash(){ setRoute(getHash()); }
+        window.addEventListener('hashchange', onHash);
+        if(!location.hash) setHash('/'); // дефолт
+        return function(){ window.removeEventListener('hashchange', onHash); };
+      },[]);
+      React.useEffect(function(){ try{ tg && tg.expand && tg.expand(); }catch(e){} },[]);
+
+      function page(){
+        switch(route){
+          case '/': return React.createElement(Welcome,null);
+          case '/about': return React.createElement(About,null);
+          case '/login': return React.createElement(Login,null);
+          case '/register': return React.createElement(Register,null);
+          case '/profile': return React.createElement(Profile,null);
+          case '/support': return React.createElement(Support,null);
+          case '/stats': return React.createElement(Stats,null);
+          default: return React.createElement(Welcome,null);
+        }
+      }
+
+      return React.createElement('div',{className:'wrap'},
         React.createElement(Header,null),
-        React.createElement(Routes,null,
-          React.createElement(Route,{path:"/", element:React.createElement(Welcome,null)}),
-          React.createElement(Route,{path:"/about", element:React.createElement(About,null)}),
-          React.createElement(Route,{path:"/login", element:React.createElement(Login,null)}),
-          React.createElement(Route,{path:"/register", element:React.createElement(Register,null)}),
-          React.createElement(Route,{path:"/profile", element:React.createElement(Profile,null)}),
-          React.createElement(Route,{path:"/support", element:React.createElement(Support,null)}),
-          React.createElement(Route,{path:"/stats", element:React.createElement(Stats,null)})
-        ),
-        React.createElement("div",{className:"footer"},"© ЛЕГИОН")
+        page(),
+        React.createElement('div',{className:'footer'},'© ЛЕГИОН')
       );
     }
 
     try{
-      ReactDOM.createRoot(document.getElementById('root')).render(
-        React.createElement(HashRouter,null, React.createElement(App,null))
-      );
-      onOk(); // прячем диагностику
-    }catch(e){
-      log('Инициализация упала: '+ (e && e.message ? e.message : e));
-    }
+      ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App,null));
+      onOk();
+    }catch(e){ log('Инициализация упала: '+(e&&e.message?e.message:e)); }
 
-    // на всякий — ловим необработанные ошибки
-    window.onerror = function(msg, src, line, col, err){
-      var text = 'JS ошибка: '+msg+' @'+(src||'')+':'+(line||0);
-      var d = document.getElementById('diag'); d.className=''; d.textContent = text;
-    };
+    window.onerror=function(msg,src,line){ var d=document.getElementById('diag'); d.className=''; d.textContent='JS ошибка: '+msg+' @'+(src||'')+':'+(line||0); };
   }
   </script>
 </body>
