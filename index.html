@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Легион — парк курьеров</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.production.min.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{
+      --bg:#0f0f0f;
+      --panel:#151515;
+      --text:#e9e9e9;
+      --muted:#bcbcbc;
+      --accent:#d74848;
+      --accent-2:#ff3b3b;
+      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui}
+    .wrap{max-width:960px;margin:0 auto;padding:18px 18px 40px}
+    .card{background:var(--panel);padding:18px;border-radius:var(--radius);box-shadow:var(--shadow)}
+    .btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 14px;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div id="root">Загрузка...</div>
+  <script type="text/javascript">
+    document.getElementById('root').innerHTML = '<h1>ЛЕГИОН</h1><p>Мини‑сайт успешно работает!</p>';
+  </script>
+</body>
+</html>
