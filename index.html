@@ -3,31 +3,37 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Легион — парк курьеров</title>
-  <!-- React через CDN, чтобы не собирать -->
-<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
-<script crossorigin src="https://cdn.jsdelivr.net/npm/react-router-dom@6/umd/react-router-dom.production.min.js"></script>
+  <title>ЛЕГИОН — парк курьеров</title>
+
+  <!-- ПИННОВАННЫЕ CDN (стабильно в WebView Telegram) -->
+  <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://cdn.jsdelivr.net/npm/react-router-dom@6.23.1/umd/react-router-dom.production.min.js"></script>
+
   <!-- Telegram WebApp API -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
     :root{
-      --bg:#0f0f0f;           /* глубокий чёрный */
-      --panel:#151515;        /* панель/карточки */
-      --text:#e9e9e9;         /* основной текст */
-      --muted:#bcbcbc;        /* вторичный текст */
-      --accent:#d74848;       /* красный акцент */
-      --accent-2:#ff3b3b;     /* неон для hover/деталей */
-      --ok:#2ecc71; --warn:#f1c40f; --bad:#e74c3c;
-      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --bg:#0f0f0f;
+      --panel:#151515;
+      --text:#e9e9e9;
+      --muted:#bcbcbc;
+      --accent:#d74848;
+      --accent-2:#ff3b3b;
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
     html,body,#root{height:100%}
     body{
-      margin:0; background:radial-gradient(1200px 900px at 100% -10%, rgba(215,72,72,.12), transparent 35%),
-                radial-gradient(1200px 900px at -10% 110%, rgba(255,59,59,.08), transparent 35%),
-                var(--bg);
-      color:var(--text); font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      margin:0;
+      background:
+        radial-gradient(1200px 900px at 100% -10%, rgba(215,72,72,.12), transparent 35%),
+        radial-gradient(1200px 900px at -10% 110%, rgba(255,59,59,.08), transparent 35%),
+        var(--bg);
+      color:var(--text);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
     }
     .wrap{max-width:960px;margin:0 auto;padding:18px 18px 40px}
     header{display:flex;align-items:center;gap:12px;margin:8px 0 20px}
@@ -37,11 +43,13 @@
       box-shadow:0 0 18px rgba(215,72,72,.35), inset 0 0 14px rgba(0,0,0,.3);
     }
     .brand{font-weight:700;letter-spacing:.4px}
+    .hint{font-size:13px;color:var(--muted)}
     .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.02), transparent),
-                 var(--panel);
-      box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.06);
-      border-radius:var(--radius); padding:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
     }
     h1{margin:0 0 6px;font-size:22px;letter-spacing:.3px}
     h2{margin:0 0 10px;font-size:18px;color:#fff}
@@ -50,227 +58,187 @@
     .grid.cols-2{grid-template-columns:1fr 1fr}
     .grid.cols-3{grid-template-columns:1fr 1fr 1fr}
     @media (max-width:720px){.grid.cols-2,.grid.cols-3{grid-template-columns:1fr}}
-
     .btn{
-      appearance:none; border:1px solid rgba(255,255,255,.08);
+      appearance:none;
+      border:1px solid rgba(255,255,255,.08);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));
-      color:#fff; padding:12px 14px; border-radius:12px; cursor:pointer;
-      transition:.2s; font-weight:600; letter-spacing:.2px; text-align:center;
+      color:#fff;padding:12px 14px;border-radius:12px;cursor:pointer;
+      transition:.2s;font-weight:600;letter-spacing:.2px;text-align:center
     }
-    .btn:hover{transform:translateY(-1px); border-color:rgba(255,255,255,.16)}
-    .btn.primary{
-      background:linear-gradient(135deg, var(--accent), var(--accent-2));
-      border:none; box-shadow:0 8px 22px rgba(215,72,72,.35);
-    }
+    .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.16)}
+    .btn.primary{background:linear-gradient(135deg, var(--accent), var(--accent-2));border:none;box-shadow:0 8px 22px rgba(215,72,72,.35)}
     .btn.ghost{background:transparent}
     .btn.full{width:100%}
-
-    .pill{display:inline-flex;gap:6px;align-items:center;
-      background:rgba(255,255,255,.06); padding:6px 10px;border-radius:999px;
+    .pill{
+      display:inline-flex;gap:6px;align-items:center;
+      background:rgba(255,255,255,.06);padding:6px 10px;border-radius:999px;
       font-size:13px;color:#fff;border:1px solid rgba(255,255,255,.08)
     }
-
     .field{display:grid;gap:6px}
     .input, select{
-      width:100%; padding:12px 14px; color:#fff;
-      background:#131313; border:1px solid rgba(255,255,255,.12);
-      border-radius:12px; outline:none; transition:.2s;
+      width:100%;padding:12px 14px;color:#fff;background:#131313;
+      border:1px solid rgba(255,255,255,.12);border-radius:12px;outline:none;transition:.2s
     }
     .input:focus, select:focus{border-color:var(--accent)}
-    .hint{font-size:13px;color:var(--muted)}
     .footer{margin-top:12px;font-size:13px;color:var(--muted);text-align:center}
     .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);margin:12px 0}
     .emoji{filter:drop-shadow(0 2px 6px rgba(255,255,255,.2))}
-    .nav{display:flex;gap:10px;flex-wrap:wrap}
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-<script>
-  // Покажем на странице, если React внезапно не подхватился
-  setTimeout(function(){
-    if (!window.React || !window.ReactDOM || !window.ReactRouterDOM) {
-      var warn = document.createElement('div');
-      warn.style.cssText='position:fixed;left:12px;bottom:12px;background:#261313;color:#fff;padding:10px 12px;border-radius:8px;border:1px solid #a33;';
-      warn.textContent='Не загрузились библиотеки (CDN). Проверьте интернет/CDN.';
-      document.body.appendChild(warn);
-      console.error('CDN not loaded:', {React: !!window.React, ReactDOM: !!window.ReactDOM, RRD: !!window.ReactRouterDOM});
-    }
-  }, 800);
-</script>
-
   <script type="text/javascript">
-  const { useEffect, useMemo, useState } = React;
-  const { HashRouter, Routes, Route, useNavigate } = ReactRouterDOM;
+    // Telegram WebApp подготовка
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      tg.setHeaderColor("#0f0f0f");
+      tg.setBackgroundColor("#0f0f0f");
+    }
 
-  // --- Telegram WebApp glue ---
-  const tg = window.Telegram?.WebApp;
-  if (tg) {
-    tg.ready(); tg.expand();
-    tg.setHeaderColor("#0f0f0f"); tg.setBackgroundColor("#0f0f0f");
-  }
+    const { HashRouter, Routes, Route, useNavigate } = ReactRouterDOM;
 
-  // UI atoms
-  const Card = (p)=>React.createElement("div", {className:"card "+(p.className||"")}, p.children);
-  const Btn  = ({children, onClick, variant, full, href}) =>
-    React.createElement(href?"a":"button", {
-      className:"btn "+(variant||"")+" "+(full?"full":""), onClick, href
-    }, children);
+    // Простые UI-компоненты
+    const Card = (p)=>React.createElement("div",{className:"card "+(p.className||"")},p.children);
+    const Btn  = ({children,onClick,variant,full,href}) =>
+      React.createElement(href?"a":"button",{className:"btn "+(variant||"")+" "+(full?"full":""),onClick,href},children);
 
-  const Header = ()=>(
-    React.createElement("header", null,
-      React.createElement("div",{className:"logo"}),
-      React.createElement("div", null,
-        React.createElement("div",{className:"brand"},"ЛЕГИОН"),
-        React.createElement("div",{className:"hint"},"Парк курьеров")
-      ),
-      )
-  );
+    const Header = () =>
+      React.createElement("header",null,
+        React.createElement("div",{className:"logo"}),
+        React.createElement("div",null,
+          React.createElement("div",{className:"brand"},"ЛЕГИОН"),
+          React.createElement("div",{className:"hint"},"Парк курьеров")
+        )
+      );
 
-  // Routing pages
-  const Welcome = ()=>{
-    const nav = useNavigate();
-    return (
-      React.createElement("div",{className:"grid", style:{gap:16}},
+    // Страницы
+    const Welcome = () => {
+      const nav = useNavigate();
+      return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Работай с теми, кто ценит твоё время"),
           React.createElement("p",null,"Парк ЛЕГИОН — надёжные выплаты, поддержка и удобные смены."),
           React.createElement("div",{className:"grid cols-2"},
-            React.createElement(Btn,{variant:"primary", onClick:()=>nav("/login")},"🔑 Войти"),
+            React.createElement(Btn,{variant:"primary",onClick:()=>nav("/login")},"🔑 Войти"),
             React.createElement(Btn,{onClick:()=>nav("/register")},"📝 Зарегистрироваться"),
           ),
           React.createElement("div",{style:{height:8}}),
-          React.createElement(Btn,{variant:"ghost", full:true, onClick:()=>nav("/about")},"ℹ️ Подробнее")
+          React.createElement(Btn,{variant:"ghost",full:true,onClick:()=>nav("/about")},"ℹ️ Подробнее")
         ),
         React.createElement(Card,null,
-          React.createElement("div",{className:"pill"}, "⚡ Быстрые выплаты"),
-          React.createElement("div",{className:"pill", style:{marginLeft:8}}, "🛡 Поддержка 8:00–00:00"),
+          React.createElement("div",{className:"pill"},"⚡ Быстрые выплаты"),
+          React.createElement("div",{className:"pill",style:{marginLeft:8}},"🛡 Поддержка 8:00–00:00"),
         )
-      )
-    )
-  };
+      );
+    };
 
-  const About = ()=>{
-    const nav = useNavigate();
-    return (
-      React.createElement("div",{className:"grid", style:{gap:16}},
+    const About = () => {
+      const nav = useNavigate();
+      return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"О парке"),
-          React.createElement("p",null,"Мы подключаем курьеров по всей России. Работа с популярными сервисами доставки, прозрачные условия и поддержка."),
+          React.createElement("p",null,"Подключаем курьеров по всей России. Прозрачные условия, стабильные выплаты и поддержка."),
           React.createElement("div",{className:"divider"}),
           React.createElement("h2",null,"Преимущества"),
           React.createElement("div",{className:"grid cols-3"},
-            React.createElement("div",null, React.createElement("div",{className:"emoji"},"💳"), React.createElement("p",null,"Выплаты вовремя")),
-            React.createElement("div",null, React.createElement("div",{className:"emoji"},"🧭"), React.createElement("p",null,"Удобные смены")),
-            React.createElement("div",null, React.createElement("div",{className:"emoji"},"🛟"), React.createElement("p",null,"Живая поддержка")),
+            React.createElement("div",null,React.createElement("div",{className:"emoji"},"💳"),React.createElement("p",null,"Выплаты вовремя")),
+            React.createElement("div",null,React.createElement("div",{className:"emoji"},"🧭"),React.createElement("p",null,"Удобные смены")),
+            React.createElement("div",null,React.createElement("div",{className:"emoji"},"🛟"),React.createElement("p",null,"Живая поддержка")),
           ),
           React.createElement("div",{style:{height:8}}),
-          React.createElement(Btn,{variant:"primary", onClick:()=>nav("/register")},"Подключиться")
+          React.createElement(Btn,{variant:"primary",onClick:()=>nav("/register")},"Подключиться")
         )
-      )
-    )
-  };
+      );
+    };
 
-  const Login = ()=>{
-    const nav = useNavigate();
-    // В мини-аппе логинится сам телеграм-пользователь (initDataUnsafe.user)
-    const user = tg?.initDataUnsafe?.user;
-    return (
-      React.createElement("div",{className:"grid", style:{gap:16}},
+    const Login = () => {
+      const nav = useNavigate();
+      const user = tg?.initDataUnsafe?.user;
+      return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Вход"),
           user
-            ? React.createElement("p",null, "Вы вошли как ", React.createElement("b",null, (user.username?("@"+user.username):`${user.first_name||""} ${user.last_name||""}`)))
-            : React.createElement("p",null, "Откройте мини-приложение из чата с ботом."),
+            ? React.createElement("p",null,"Вы вошли как ",React.createElement("b",null,user.username?("@"+user.username):((user.first_name||"")+" "+(user.last_name||""))))
+            : React.createElement("p",null,"Откройте мини-приложение из чата с ботом."),
           React.createElement("div",{className:"grid cols-2"},
-            React.createElement(Btn,{variant:"primary", onClick:()=>nav("/profile")},"Перейти в профиль"),
+            React.createElement(Btn,{variant:"primary",onClick:()=>nav("/profile")},"Перейти в профиль"),
             React.createElement(Btn,{onClick:()=>nav("/")},"На главную")
           )
         )
-      )
-    )
-  };
+      );
+    };
 
-  const Profile = ()=>{
-    const nav = useNavigate();
-    // Тут обычно грузим профиль с бэка. Для демо — данные из user:
-    const user = tg?.initDataUnsafe?.user;
-    return (
-      React.createElement("div",{className:"grid", style:{gap:16}},
+    const Profile = () => {
+      const nav = useNavigate();
+      const user = tg?.initDataUnsafe?.user;
+      return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Профиль"),
-          React.createElement("p",null,"ФИО: ", React.createElement("b",null, (user? `${user.first_name||""} ${user.last_name||""}` : "—"))),
-          React.createElement("p",null,"Статус: ", React.createElement("b",null,"В разработке")),
+          React.createElement("p",null,"ФИО: ",React.createElement("b",null,user?(user.first_name||"")+" "+(user.last_name||""):"—")),
+          React.createElement("p",null,"Статус: ",React.createElement("b",null,"В разработке")),
           React.createElement("div",{className:"grid cols-2"},
             React.createElement(Btn,{onClick:()=>nav("/stats")},"📊 Статистика"),
             React.createElement(Btn,{onClick:()=>nav("/support")},"🛟 Поддержка")
           ),
           React.createElement("div",{style:{height:8}}),
-          React.createElement(Btn,{variant:"ghost", onClick:()=>nav("/")},"⬅️ На главную")
+          React.createElement(Btn,{variant:"ghost",onClick:()=>nav("/")},"⬅️ На главную")
         )
-      )
-    )
-  };
+      );
+    };
 
-  const Support = ()=>{
-    const nav = useNavigate();
-    return (
-      React.createElement("div",{className:"grid", style:{gap:16}},
+    const Support = () => {
+      const nav = useNavigate();
+      return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Поддержка"),
           React.createElement("p",null,"Раздел скоро будет доступен."),
           React.createElement(Btn,{onClick:()=>nav(-1)},"⬅️ Назад")
         )
-      )
-    )
-  };
+      );
+    };
 
-  const Stats = ()=>{
-    const nav = useNavigate();
-    return (
-      React.createElement("div",{className:"grid", style:{gap:16}},
+    const Stats = () => {
+      const nav = useNavigate();
+      return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Статистика"),
           React.createElement("p",null,"В разработке — синхронизируем с ботом."),
           React.createElement(Btn,{onClick:()=>nav(-1)},"⬅️ Назад")
         )
-      )
-    )
-  };
-
-  const Register = ()=>{
-    const nav = useNavigate();
-    const [form,setForm]=React.useState({name:"",city:"",phone:"",transport:"Пеший",agg:"TopGO"});
-    const change = (k)=>(e)=>setForm({...form,[k]:e.target.value});
-    const submit = ()=>{
-      const payload = {
-        action: "registration",
-        data: form,
-      };
-      if (tg && tg.sendData){
-        tg.sendData(JSON.stringify(payload)); // улетит в бота → он перешлёт админу
-        tg.HapticFeedback?.notificationOccurred("success");
-      }
-      alert("Заявка отправлена. Мы свяжемся с вами в ближайшее время!");
-      nav("/"); // или в профиль
+      );
     };
-    return (
-      React.createElement("div",{className:"grid", style:{gap:16}},
+
+    const Register = () => {
+      const nav = useNavigate();
+      const [form,setForm] = React.useState({name:"",city:"",phone:"",transport:"Пеший",agg:"TopGO"});
+      const change = (k)=>(e)=>setForm({...form,[k]:e.target.value});
+      const submit = ()=>{
+        const payload = { action:"registration", data:form };
+        if (tg?.sendData) {
+          tg.sendData(JSON.stringify(payload)); // забираем в боте через WebAppData
+          tg.HapticFeedback?.notificationOccurred("success");
+        }
+        alert("Заявка отправлена. Мы свяжемся с вами в ближайшее время!");
+        nav("/");
+      };
+      return React.createElement("div",{className:"grid",style:{gap:16}},
         React.createElement(Card,null,
           React.createElement("h1",null,"Заявка на подключение"),
-          React.createElement("div",{className:"grid", style:{gap:12}},
+          React.createElement("div",{className:"grid",style:{gap:12}},
             React.createElement("div",{className:"field"},
               React.createElement("label",null,"ФИО"),
-              React.createElement("input",{className:"input", placeholder:"Иванов Иван", value:form.name, onChange:change("name")})
+              React.createElement("input",{className:"input",placeholder:"Иванов Иван",value:form.name,onChange:change("name")})
             ),
             React.createElement("div",{className:"field"},
               React.createElement("label",null,"Город"),
-              React.createElement("input",{className:"input", placeholder:"Москва", value:form.city, onChange:change("city")})
+              React.createElement("input",{className:"input",placeholder:"Москва",value:form.city,onChange:change("city")})
             ),
             React.createElement("div",{className:"field"},
               React.createElement("label",null,"Телефон"),
-              React.createElement("input",{className:"input", inputMode:"tel", placeholder:"+7 9__", value:form.phone, onChange:change("phone")})
+              React.createElement("input",{className:"input",inputMode:"tel",placeholder:"+7 9__",value:form.phone,onChange:change("phone")})
             ),
             React.createElement("div",{className:"grid cols-2"},
               React.createElement("div",{className:"field"},
@@ -293,20 +261,18 @@
               )
             ),
             React.createElement("div",{className:"grid cols-2"},
-              React.createElement(Btn,{variant:"primary", onClick:submit},"Отправить"),
+              React.createElement(Btn,{variant:"primary",onClick:submit},"Отправить"),
               React.createElement(Btn,{onClick:()=>nav(-1)},"⬅️ Назад")
             ),
             React.createElement("div",{className:"hint"},"Заявка уходит менеджеру парка. Мы отвечаем в течение дня.")
           )
         )
-      )
-    )
-  };
+      );
+    };
 
-  const App = ()=>{
-    useEffect(()=>{ if(tg){ tg.expand(); } },[]);
-    return (
-      React.createElement("div",{className:"wrap"},
+    const App = () => {
+      React.useEffect(()=>{ tg?.expand(); },[]);
+      return React.createElement("div",{className:"wrap"},
         React.createElement(Header,null),
         React.createElement(Routes,null,
           React.createElement(Route,{path:"/", element:React.createElement(Welcome)}),
@@ -318,13 +284,12 @@
           React.createElement(Route,{path:"/stats", element:React.createElement(Stats)}),
         ),
         React.createElement("div",{className:"footer"},"© ЛЕГИОН")
-      )
-    )
-  };
+      );
+    };
 
-  ReactDOM.createRoot(document.getElementById('root')).render(
-    React.createElement(HashRouter,null, React.createElement(App))
-  );
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      React.createElement(HashRouter,null, React.createElement(App))
+    );
   </script>
 </body>
 </html>
